@@ -29,7 +29,6 @@ DEBUG = os.environ.get('DEBUG', 'False') == '1'
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'spotme.life').split(' ')
 
 # Force all requests to go through /api/
-FORCE_SCRIPT_NAME = '/api'
 
 
 # Application definition
