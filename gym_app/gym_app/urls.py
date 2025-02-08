@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from gym.views import GymVisitList, home, average_rating_view, time_based_chart_view
+from django.contrib.auth import views as auth_views
+from gym import views
+
 
 
 urlpatterns = [
@@ -25,4 +28,11 @@ urlpatterns = [
     path('api/gym-visits/', GymVisitList.as_view(), name='gym-visit-list'),
     path('api/gym/average-rating/', average_rating_view, name='average-rating'),
     path('api/gym/time-based-chart/', time_based_chart_view, name='time-based-chart'),
+    path('register/', views.register, name='register'),
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]

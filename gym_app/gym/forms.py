@@ -2,6 +2,7 @@
 from django import forms
 from .models import GymVisit
 
+
 class GymVisitAdminForm(forms.ModelForm):
     class Meta:
         model = GymVisit

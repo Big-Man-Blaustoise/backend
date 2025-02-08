@@ -53,10 +53,25 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'gym_app.urls'
 
+
+# Redirect settings for login and logout
+LOGIN_REDIRECT_URL = '/'  # Redirect users after login
+LOGOUT_REDIRECT_URL = '/'  # Redirect users after logout
+
+# Login URL configuration (optional, can be left default)
+LOGIN_URL = '/login/'  # If you have a custom login URL
+
+# Email settings for password reset (optional)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
