@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from gym.views import GymVisitList, home, leaderboard
+from gym.views import GymVisitList, home, leaderboard, profile_detail
 from django.urls import path
 
 urlpatterns = [
@@ -24,4 +24,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/gym-visits/', GymVisitList.as_view(), name='gym-visit-list'),
     path('leaderboard/', leaderboard, name='leaderboard'),
+    path('profiles/<str:username>/', profile_detail, name='profile_detail'),
 ]

@@ -3,11 +3,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer  # Optional, for explicit JSON rendering
 from .models import GymVisit
-from .serializers import GymVisitSerializer
+from .serializers import GymVisitSerializer, ProfileSerializer
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Count
 from django.utils import timezone
-from datetime import timedelta
+from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.models import User
+from django.urls import reverse
+from datetime import timedelta, datetime, time
+from django.utils.timezone import make_aware
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from gym.models import Profile 
+
 
 
 def home(request):
@@ -24,37 +32,75 @@ class GymVisitList(APIView):
         serializer = GymVisitSerializer(visits, many=True)
         # Return the data as a JSON response
         return Response(serializer.data)
-    
-
 
 def leaderboard(request):
-    # Get current time from Django's timezone (uses settings.TIME_ZONE)
-    now = timezone.now()
+    # Get today's local date
+    today = timezone.localdate()
+
+    # --- WEEKLY BOUNDARIES (Sunday to Saturday) ---
+    # In Python, weekday() returns Monday=0, ... Sunday=6.
+    # To get the most recent Sunday, calculate:
+    days_since_sunday = (today.weekday() + 1) % 7  
+    start_of_week = today - timedelta(days=days_since_sunday)
+    end_of_week = start_of_week + timedelta(days=6)
+
+    # Convert the date boundaries to timezone-aware datetimes
+    start_of_week_dt = make_aware(datetime.combine(start_of_week, time.min))
+    end_of_week_dt = make_aware(datetime.combine(end_of_week, time.max))
+
+    # --- MONTHLY BOUNDARIES (Current Calendar Month) ---
+    start_of_month = today.replace(day=1)
+    start_of_month_dt = make_aware(datetime.combine(start_of_month, time.min))
+    # For the monthly leaderboard, we consider all visits from the start of the month until now.
     
-    # Calculate the boundaries for the week (last 7 days) and month (last 30 days)
-    week_start = now - timedelta(days=7)
-    month_start = now - timedelta(days=30)
-    
-    # Aggregation: count visits per user within the last week and month.
-    week_leaderboard = (
-        GymVisit.objects.filter(entry_time__gte=week_start)
-        .values('user')
+    # --- QUERYING THE DATABASE ---
+    # Weekly leaderboard: visits between start_of_week_dt and end_of_week_dt.
+    week_queryset = (
+        GymVisit.objects.filter(entry_time__gte=start_of_week_dt, entry_time__lte=end_of_week_dt)
+        .values('user__username')
         .annotate(visit_count=Count('id'))
         .order_by('-visit_count')
     )
     
-    month_leaderboard = (
-        GymVisit.objects.filter(entry_time__gte=month_start)
-        .values('user')
+    # Monthly leaderboard: visits since the first day of the month.
+    month_queryset = (
+        GymVisit.objects.filter(entry_time__gte=start_of_month_dt)
+        .values('user__username')
         .annotate(visit_count=Count('id'))
         .order_by('-visit_count')
     )
     
-    # Prepare the response data as a dictionary
+    # --- BUILDING THE JSON RESPONSE WITH CLICKABLE PROFILE URLs ---
+    week_leaderboard = []
+    for entry in week_queryset:
+        username = entry['user__username']
+        profile = get_object_or_404(Profile, user__username=username)
+        serializer = ProfileSerializer(profile)
+        week_leaderboard.append({
+            'user': username,
+            'visit_count': entry['visit_count'],
+            'profile': serializer.data,
+        })
+        
+    month_leaderboard = []
+    for entry in month_queryset:
+        username = entry['user__username']
+        profile = get_object_or_404(Profile, user__username=username)
+        month_leaderboard.append({
+            'user': username,
+            'visit_count': entry['visit_count'],
+            'profile': serializer.data,
+        })
+    
     data = {
-        "week_leaderboard": list(week_leaderboard),
-        "month_leaderboard": list(month_leaderboard)
+        "week_leaderboard": week_leaderboard,
+        "month_leaderboard": month_leaderboard
     }
     
-    # Return the data as JSON
     return JsonResponse(data)
+
+def profile_detail(request, username):
+    # Retrieve the user by username; assuming each user has an associated profile.
+    user = get_object_or_404(User, username=username)
+    # Render a template (e.g., 'profile_detail.html') and pass the user's profile
+    return render(request, 'profile_detail.html', {'profile': user.profile})
