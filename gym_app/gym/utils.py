@@ -12,7 +12,7 @@ def calculate_average_rating():
     
     # Assuming you store the 'gym_busyness' as an integer in the model (e.g., 0, 1, 2, 3)
     if recent_visits.exists():
-        total_rating = sum(visit.gym_busyness for visit in recent_visits)
+        total_rating = sum(visit.gym_busy_rating for visit in recent_visits)
         average_rating = total_rating / len(recent_visits)
     else:
         average_rating = 0  # Default to 0 if no visits in the last hour
@@ -37,7 +37,8 @@ def get_time_based_ratings():
         visits_in_bin = GymVisit.objects.filter(entry_time__gte=time_bin_start, entry_time__lt=time_bin_end)
         
         if visits_in_bin.exists():
-            avg_rating_in_bin = sum(visit.gym_busyness for visit in visits_in_bin) / len(visits_in_bin)
+            # Sum up the gym_busy_rating values and calculate the average
+            avg_rating_in_bin = sum(visit.gym_busy_rating for visit in visits_in_bin) / len(visits_in_bin)
         else:
             avg_rating_in_bin = 0
 

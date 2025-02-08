@@ -5,7 +5,9 @@ from .models import GymVisit
 class GymVisitAdminForm(forms.ModelForm):
     class Meta:
         model = GymVisit
-        fields = ['user', 'entry_time', 'exit_time', 'gym_location']
-    
-    entry_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
-    exit_time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+        fields = ['user', 'entry_time', 'gym_location', 'gym_busy_rating']
+
+    gym_busy_rating = forms.ChoiceField(
+        choices=GymVisit._meta.get_field('gym_busy_rating').choices,
+        widget=forms.Select
+    )

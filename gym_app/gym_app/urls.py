@@ -23,6 +23,6 @@ urlpatterns = [
     path('', home, name='home'),  # Render the home view for the root URL
     path('admin/', admin.site.urls),
     path('api/gym-visits/', GymVisitList.as_view(), name='gym-visit-list'),
-    path('average-rating/', average_rating_view, name='average-rating'),
-    path('time-based-chart/', time_based_chart_view, name='time-based-chart'),
+    path('api/gym/average-rating/', average_rating_view, name='average-rating'),
+    path('api/gym/time-based-chart/', time_based_chart_view, name='time-based-chart'),
 ]
