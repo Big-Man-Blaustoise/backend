@@ -23,4 +23,3 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/gym-visits/', GymVisitList.as_view(), name='gym-visit-list'),
 ]
-
