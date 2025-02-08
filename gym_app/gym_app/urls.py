@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from gym.views import GymVisitList, home
 
 urlpatterns = [
+    path('', home, name='home'),  # Render the home view for the root URL
     path('admin/', admin.site.urls),
+    path('api/gym-visits/', GymVisitList.as_view(), name='gym-visit-list'),
 ]
-# hey
