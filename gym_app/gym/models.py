@@ -11,7 +11,7 @@ class Profile(models.Model):
         return self.user.username
     
 class GymVisit(models.Model):
-    user = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     entry_time = models.DateTimeField()
     gym_location = models.CharField(max_length=100, null=True, blank=True)
     gym_busy_rating = models.IntegerField(choices=[

@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/gym-visits/', GymVisitList.as_view(), name='gym-visit-list'),
     path('api/gym/average-rating/', average_rating_view, name='average-rating'),
     path('api/gym/time-based-chart/', time_based_chart_view, name='time-based-chart'),
+    path('api/gym-visits/user/<int:user_id>/', views.get_user_gym_visits, name='user-gym-visits'),
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
