@@ -15,9 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from gym.views import GymVisitList, home, leaderboard, profile_detail
-from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -27,4 +26,5 @@ urlpatterns = [
     path('api/gym-visits/', GymVisitList.as_view(), name='gym-visit-list'),
     path('api/leaderboard/', leaderboard, name='leaderboard'),
     path('api/profiles/<str:username>/', profile_detail, name='profile_detail'),
+    path('api/auth/', include('django.contrib.auth.urls')),  # Django's built-in authentication URLs
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
