@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path
 from gym.views import GymVisitList, home, leaderboard, profile_detail
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', home, name='home'),  # Render the home view for the root URL
     path('admin/', admin.site.urls),
-    path('api/gym-visits/', GymVisitList.as_view(), name='gym-visit-list'),
+    path('gym-visits/', GymVisitList.as_view(), name='gym-visit-list'),
     path('leaderboard/', leaderboard, name='leaderboard'),
     path('profiles/<str:username>/', profile_detail, name='profile_detail'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
